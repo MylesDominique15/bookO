@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Loader2,
@@ -7,66 +7,13 @@ import {
   BarChart3,
   RefreshCw,
   Sparkles,
-  AlertCircle,
   Trophy,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { ReaderContext } from "../context/ReaderContext";
 
-// ─── OpenAI config ─────────────────────────────────────────────────────────────
-// Replace with your real key. In production, proxy this through your backend.
-const OPENAI_API_KEY = "YOUR_OPENAI_API_KEY_HERE";
-const OPENAI_MODEL = "gpt-4o-mini";
-
-const SYSTEM_PROMPT = `You are an expert academic assessment designer. Given a passage of text, 
-generate a multiple-choice comprehension quiz. Return ONLY a valid JSON array with no markdown, 
-no preamble, and no trailing text. Each object must have exactly these fields:
-{
-  "id": number,
-  "question": string,
-  "options": [string, string, string, string],
-  "correctIndex": number (0–3),
-  "explanation": string
-}
-Generate exactly 5 questions. Vary difficulty from recall to inference.`;
-
-async function generateQuiz(text) {
-  const trimmed = text.slice(0, 3000);
-
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: OPENAI_MODEL,
-      temperature: 0.4,
-      max_tokens: 1500,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: `Generate a 5-question multiple-choice quiz based on this text:\n\n${trimmed}`,
-        },
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  const raw = data.choices?.[0]?.message?.content || "";
-
-  // Strip any accidental markdown fences
-  const cleaned = raw.replace(/```json|```/gi, "").trim();
-  return JSON.parse(cleaned);
-}
-
-// ─── Fallback quiz (when API key is placeholder or call fails) ────────────────
-const FALLBACK_QUIZ = [
+// ─── Sample quiz (fixed questions; no external API) ────────────────────────────
+const SAMPLE_QUIZ = [
   {
     id: 1,
     question: "What is the primary limitation of working memory according to cognitive load theory?",
@@ -514,37 +461,20 @@ function ResultsScreen({ questions, answers, onRetry, onViewStats, styles }) {
 export default function Assessment() {
   const navigate = useNavigate();
   const { styles, fontFamily } = useTheme();
-  const { extractedText, documentTitle, addSessionResult } =
-    useContext(ReaderContext);
+  const { documentTitle, addSessionResult } = useContext(ReaderContext);
 
-  const [status, setStatus] = useState("idle"); // idle | loading | ready | error | complete
+  const [status, setStatus] = useState("idle"); // idle | loading | ready | complete
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
-  const [errorMsg, setErrorMsg] = useState("");
-
-  const isUsingFallback =
-    OPENAI_API_KEY === "YOUR_OPENAI_API_KEY_HERE";
 
   const startQuiz = async () => {
     setStatus("loading");
     setAnswers([]);
     setCurrentIndex(0);
-
-    try {
-      if (isUsingFallback) {
-        await new Promise((r) => setTimeout(r, 900));
-        setQuestions(FALLBACK_QUIZ);
-      } else {
-        const quiz = await generateQuiz(extractedText || "");
-        setQuestions(quiz);
-      }
-      setStatus("ready");
-    } catch (err) {
-      console.error("Quiz generation error:", err);
-      setErrorMsg(err.message || "Failed to generate quiz.");
-      setStatus("error");
-    }
+    await new Promise((r) => setTimeout(r, 600));
+    setQuestions(SAMPLE_QUIZ);
+    setStatus("ready");
   };
 
   const handleAnswer = (optionIndex) => {
@@ -682,9 +612,8 @@ export default function Assessment() {
                     lineHeight: 1.6,
                   }}
                 >
-                  {isUsingFallback
-                    ? "5 sample questions will be generated. Add your OpenAI API key to generate questions from your own PDF."
-                    : "Claude will generate 5 multiple-choice questions based on your PDF."}
+                  Five sample multiple-choice questions on cognitive load theory —
+                  great for a quick comprehension check after reading.
                 </p>
               </div>
               <button
@@ -732,49 +661,8 @@ export default function Assessment() {
                 style={{ animation: "spin 0.9s linear infinite" }}
               />
               <p style={{ fontSize: "15px", color: "var(--color-subtext)" }}>
-                Generating your quiz…
+                Loading quiz…
               </p>
-            </div>
-          )}
-
-          {/* Error */}
-          {status === "error" && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "16px",
-                padding: "48px 32px",
-                background: "#ef444408",
-                border: "1px solid #ef444433",
-                borderRadius: "16px",
-                textAlign: "center",
-                animation: "cardIn 0.3s ease",
-              }}
-            >
-              <AlertCircle size={28} color="#ef4444" />
-              <div>
-                <p style={{ fontSize: "15px", fontWeight: "600", color: "#dc2626", marginBottom: "6px" }}>
-                  Failed to generate quiz
-                </p>
-                <p style={{ fontSize: "13px", color: "var(--color-subtext)" }}>{errorMsg}</p>
-              </div>
-              <button
-                onClick={handleRetry}
-                style={{
-                  padding: "10px 22px",
-                  borderRadius: "10px",
-                  border: "1px solid var(--color-border)",
-                  background: "var(--color-surface)",
-                  color: "var(--color-text)",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                }}
-              >
-                Try Again
-              </button>
             </div>
           )}
 

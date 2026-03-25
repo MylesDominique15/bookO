@@ -3,6 +3,7 @@ import React, { createContext, useState, useCallback } from "react";
 export const ReaderContext = createContext(null);
 
 export function ReaderProvider({ children }) {
+  /** Full plain text from the last successful PDF extraction (set on Home). */
   const [extractedText, setExtractedText] = useState("");
   const [documentTitle, setDocumentTitle] = useState("");
   const [sessionResults, setSessionResults] = useState([]);

@@ -17,6 +17,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "copy-pdf-worker": "node -e \"require('fs').copyFileSync(require('path').join('node_modules','pdfjs-dist','build','pdf.worker.min.mjs'),require('path').join('public','pdf.worker.min.mjs'))\"",
+    "postinstall": "npm run copy-pdf-worker",
+    "prestart": "npm run copy-pdf-worker",
+    "prebuild": "npm run copy-pdf-worker",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

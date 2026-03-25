@@ -6,6 +6,8 @@ import {
   Type,
   Volume2,
   Sun,
+  Moon,
+  BookOpen,
   ClipboardList,
   RotateCcw,
   BookMarked,
@@ -13,7 +15,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-import { useTheme, FONTS } from "../context/ThemeContext";
+import { useTheme, THEMES } from "../context/ThemeContext";
 import { ReaderContext } from "../context/ReaderContext";
 import useLineParser from "../hooks/useLineParser";
 import useReaderNavigation from "../hooks/useReaderNavigation";
@@ -184,14 +186,16 @@ function NavHint({ onNext, onPrev, activeIndex, total }) {
 // ─── Main Read Page ───────────────────────────────────────────────────────────
 export default function Read() {
   const navigate = useNavigate();
-  const { font, toggleFont, FONTS: FONT_OPTIONS } = useTheme();
+  const { font, toggleFont, FONTS: FONT_OPTIONS, cycleTheme, theme } =
+    useTheme();
   const { extractedText, documentTitle } = useContext(ReaderContext);
 
   // ── STATE & LOGIC: UNCHANGED ───────────────────────────────────────────────
   const [audioEnabled, setAudioEnabled] = useState(false);
-  const [modesEnabled, setModesEnabled] = useState(false);
 
-  const textToRender = extractedText || SAMPLE_TEXT;
+  const trimmedExtracted = (extractedText || "").trim();
+  const textToRender =
+    trimmedExtracted.length > 0 ? trimmedExtracted : SAMPLE_TEXT;
   const { containerRef, lines, isReady, reparse } = useLineParser(textToRender);
 
   const readingAreaRef = useRef(null);
@@ -210,6 +214,26 @@ export default function Read() {
     window.addEventListener("resize", onResize);
     return () => { window.removeEventListener("resize", onResize); clearTimeout(timeout); };
   }, [reparse]);
+
+  useEffect(() => {
+    if (!audioEnabled) {
+      window.speechSynthesis.cancel();
+    }
+  }, [audioEnabled]);
+
+  useEffect(() => {
+    if (!audioEnabled || !isReady || lines.length === 0) return;
+    const line = lines[activeLineIndex];
+    const text = line?.text?.trim();
+    if (!text) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, [audioEnabled, activeLineIndex, isReady, lines]);
   // ── END LOGIC ──────────────────────────────────────────────────────────────
 
   const progressPct = lines.length > 1
@@ -217,6 +241,29 @@ export default function Read() {
     : 0;
 
   const isOD = font === FONT_OPTIONS.OPEN_DYSLEXIC;
+
+  const themeModeIcon =
+    theme === THEMES.DARK ? (
+      <Moon size={14} />
+    ) : theme === THEMES.READING ? (
+      <BookOpen size={14} />
+    ) : (
+      <Sun size={14} />
+    );
+  const themeLabel =
+    theme === THEMES.DARK
+      ? "Dark"
+      : theme === THEMES.READING
+        ? "Reading"
+        : "Light";
+
+  const handleAudioToggle = () => {
+    setAudioEnabled((v) => {
+      const next = !v;
+      if (!next) window.speechSynthesis.cancel();
+      return next;
+    });
+  };
 
   return (
     <>
@@ -279,13 +326,13 @@ export default function Read() {
               icon={<Volume2 size={14} />}
               label="Audio Option"
               active={audioEnabled}
-              onClick={() => setAudioEnabled((v) => !v)}
+              onClick={handleAudioToggle}
             />
             <SidebarToggle
-              icon={<Sun size={14} />}
-              label="Modes"
-              active={modesEnabled}
-              onClick={() => setModesEnabled((v) => !v)}
+              icon={themeModeIcon}
+              label={themeLabel}
+              active={theme !== THEMES.LIGHT}
+              onClick={cycleTheme}
             />
           </div>
 
@@ -308,7 +355,9 @@ export default function Read() {
             aria-hidden="true"
             className="absolute invisible pointer-events-none text-lg leading-loose"
             style={{
-              width: "min(680px, calc(100vw - 224px - 48px))",
+              // Match visible text width: card max (48rem) minus card px-10 and line px-3
+              width:
+                "calc(min(48rem, 100vw - 14rem - 3rem) - 5rem - 1.5rem)",
               fontFamily: isOD ? "'OpenDyslexic', sans-serif" : "inherit",
               whiteSpace: "normal",
               wordBreak: "break-word",
@@ -317,7 +366,7 @@ export default function Read() {
 
           {/* ── Document "paper" card ───────────────────────────────────── */}
           <div
-            className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl shadow-orange-100/80 px-10 pt-9 pb-10"
+            className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl shadow-orange-100/80 px-10 pt-9 pb-10"
             style={{
               fontFamily: isOD ? "'OpenDyslexic', sans-serif" : "'Georgia', serif",
             }}

@@ -11,8 +11,12 @@
 # production
 /build
 
+# Copied from pdfjs-dist on postinstall (keep in sync with dependency)
+/public/pdf.worker.min.mjs
+
 # misc
 .DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local

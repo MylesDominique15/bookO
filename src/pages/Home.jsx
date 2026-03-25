@@ -8,14 +8,12 @@ import {
   BookOpen,
   X,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { ReaderContext } from "../context/ReaderContext";
 
-// ─── pdfjs-dist setup ─────────────────────────────────────────────────────────
-// Ensure the worker is configured in your app entry (index.js):
-//   import * as pdfjsLib from "pdfjs-dist";
-//   pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// ─── pdfjs-dist (worker is set once in App.jsx) ───────────────────────────────
 import * as pdfjsLib from "pdfjs-dist";
 
 async function extractTextFromPDF(file) {
@@ -297,7 +295,8 @@ function ExtractionStatus({ status, wordCount, styles }) {
 export default function Home() {
   const navigate = useNavigate();
   const { styles, fontFamily } = useTheme();
-  const { setExtractedText, setDocumentTitle } = useContext(ReaderContext);
+  const { setExtractedText, setDocumentTitle, clearDocument } =
+    useContext(ReaderContext);
 
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -317,9 +316,14 @@ export default function Home() {
       setLocalExtractedText(text);
       setWordCount(wc);
       setExtractionStatus("done");
+      const title =
+        selectedFile.name.replace(/\.pdf$/i, "") || "Untitled Document";
+      setExtractedText(text);
+      setDocumentTitle(title);
     } catch (err) {
       console.error("PDF extraction error:", err);
       setExtractionStatus("error");
+      clearDocument?.();
     }
   }, []);
 
@@ -328,16 +332,22 @@ export default function Home() {
     setExtractionStatus(null);
     setLocalExtractedText("");
     setWordCount(0);
+    clearDocument?.();
   };
 
   const handleLetsRead = () => {
-    if (!extractedText) return;
-    setExtractedText(extractedText);
-    setDocumentTitle(file?.name?.replace(".pdf", "") || "Untitled Document");
+    const text = (extractedText || "").trim();
+    if (!text) return;
+    setExtractedText(text);
+    setDocumentTitle(
+      file?.name?.replace(/\.pdf$/i, "") || "Untitled Document"
+    );
     navigate("/read");
   };
 
-  const canRead = extractionStatus === "done" && extractedText.length > 0;
+  const isExtracting = extractionStatus === "extracting";
+  const canRead =
+    extractionStatus === "done" && (extractedText || "").trim().length > 0;
 
   return (
     <>
@@ -357,6 +367,10 @@ export default function Home() {
         @keyframes heroFadeIn {
           from { opacity: 0; transform: translateY(24px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
         }
       `}</style>
 
@@ -426,7 +440,7 @@ export default function Home() {
           >
             {[
               { icon: <BookOpen size={14} />, label: "Line-by-line focus" },
-              { icon: <Sparkles size={14} />, label: "AI comprehension quiz" },
+              { icon: <Sparkles size={14} />, label: "Comprehension quiz" },
               { icon: <FileText size={14} />, label: "Any academic PDF" },
             ].map(({ icon, label }) => (
               <div
@@ -478,8 +492,13 @@ export default function Home() {
           {/* CTA */}
           <button
             onClick={handleLetsRead}
-            disabled={!canRead}
-            aria-label="Begin reading this document"
+            disabled={!canRead || isExtracting}
+            aria-busy={isExtracting}
+            aria-label={
+              isExtracting
+                ? "Processing PDF"
+                : "Begin reading this document"
+            }
             style={{
               display: "flex",
               alignItems: "center",
@@ -488,26 +507,44 @@ export default function Home() {
               padding: "16px 28px",
               borderRadius: "14px",
               border: "none",
-              background: canRead ? styles.accent : "var(--color-border)",
-              color: canRead ? "#fff" : "var(--color-subtext)",
-              cursor: canRead ? "pointer" : "not-allowed",
+              background:
+                canRead && !isExtracting ? styles.accent : "var(--color-border)",
+              color: canRead && !isExtracting ? "#fff" : "var(--color-subtext)",
+              cursor:
+                canRead && !isExtracting ? "pointer" : "not-allowed",
               fontSize: "15px",
               fontWeight: "700",
               letterSpacing: "-0.01em",
-              boxShadow: canRead ? `0 6px 24px ${styles.accent}44` : "none",
+              boxShadow:
+                canRead && !isExtracting
+                  ? `0 6px 24px ${styles.accent}44`
+                  : "none",
               transition: "all 0.25s ease",
               transform: "scale(1)",
             }}
             onMouseEnter={(e) => {
-              if (canRead) e.currentTarget.style.transform = "scale(1.02)";
+              if (canRead && !isExtracting)
+                e.currentTarget.style.transform = "scale(1.02)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "scale(1)";
             }}
           >
-            <BookOpen size={17} />
-            Let's Read
-            {canRead && <ArrowRight size={15} />}
+            {isExtracting ? (
+              <>
+                <Loader2
+                  size={17}
+                  style={{ animation: "spin 0.9s linear infinite" }}
+                />
+                Processing PDF…
+              </>
+            ) : (
+              <>
+                <BookOpen size={17} />
+                Let&apos;s Read
+                {canRead && <ArrowRight size={15} />}
+              </>
+            )}
           </button>
         </div>
       </div>
