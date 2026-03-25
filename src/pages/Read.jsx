@@ -13,6 +13,7 @@ import {
   BookMarked,
   ChevronUp,
   ChevronDown,
+  Book,
 } from "lucide-react";
 
 import { useTheme, THEMES } from "../context/ThemeContext";
@@ -20,6 +21,7 @@ import { ReaderContext } from "../context/ReaderContext";
 import useLineParser from "../hooks/useLineParser";
 import useReaderNavigation from "../hooks/useReaderNavigation";
 import PomodoroTimer from "../components/reader/PomodoroTimer";
+import DictionaryPanel from "../components/reader/DictionaryPanel";
 
 // ─── Sample text ──────────────────────────────────────────────────────────────
 const SAMPLE_TEXT = `Cognitive load theory, developed by John Sweller in the late 1980s,
@@ -192,6 +194,7 @@ export default function Read() {
 
   // ── STATE & LOGIC: UNCHANGED ───────────────────────────────────────────────
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
 
   const trimmedExtracted = (extractedText || "").trim();
   const textToRender =
@@ -329,6 +332,12 @@ export default function Read() {
               onClick={handleAudioToggle}
             />
             <SidebarToggle
+              icon={<Book size={14} />}
+              label="Dictionary"
+              active={isDictionaryOpen}
+              onClick={() => setIsDictionaryOpen((v) => !v)}
+            />
+            <SidebarToggle
               icon={themeModeIcon}
               label={themeLabel}
               active={theme !== THEMES.LIGHT}
@@ -450,6 +459,10 @@ export default function Read() {
             )}
           </div>
         </main>
+
+        {isDictionaryOpen && (
+          <DictionaryPanel onClose={() => setIsDictionaryOpen(false)} />
+        )}
       </div>
     </>
   );

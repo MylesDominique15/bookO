@@ -12,10 +12,6 @@ import Read from "./pages/Read";
 import Assessment from "./pages/Assessment";
 import Profile from "./pages/Profile";
 
-// ─── pdfjs-dist worker (same-origin; v5 uses .mjs — CDN .min.js URLs break) ─────
-import * as pdfjsLib from "pdfjs-dist";
-pdfjsLib.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL || ""}/pdf.worker.min.mjs`;
-
 // ─── Nav items ────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
   { path: "/", label: "Home", icon: HomeIcon, exact: true },
