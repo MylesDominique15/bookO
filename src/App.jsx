@@ -23,46 +23,13 @@ const NAV_ITEMS = [
 // ─── Top navigation bar ───────────────────────────────────────────────────────
 function Navbar() {
   const { styles, fontFamily } = useTheme();
-  const { documentTitle } = useContext(ReaderContext);
   const location = useLocation();
 
   const isReadPage = location.pathname === "/read";
 
-  // Hide full nav on the immersive read page — show a minimal bar instead
+  // Hide nav completely on the immersive read page.
   if (isReadPage) {
-    return (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 5, // sidebar width
-          right: 0,
-          height: "40px",
-          background: "var(--color-bg)",
-          borderBottom: "1px solid var(--color-border)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999,
-          fontFamily,
-        }}
-      >
-        <p
-          style={{
-            fontSize: "12px",
-            color: "var(--color-subtext)",
-            letterSpacing: "0.04em",
-            fontWeight: "500",
-            maxWidth: "480px",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {documentTitle || "Reading Session"}
-        </p>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -154,8 +121,6 @@ function Navbar() {
 // ─── App shell ────────────────────────────────────────────────────────────────
 function AppShell() {
   const { theme } = useTheme();
-  const location = useLocation();
-  const isReadPage = location.pathname === "/read";
 
   return (
     <div
@@ -170,7 +135,7 @@ function AppShell() {
 
       <main
         style={{
-          paddingTop: isReadPage ? "40px" : "0",
+          paddingTop: "0",
         }}
       >
         <Routes>

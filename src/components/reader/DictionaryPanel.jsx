@@ -95,6 +95,7 @@ export default function DictionaryPanel({ onClose }) {
           top: 0,
           right: 0,
           bottom: 0,
+          height: "100vh",
           width: "min(360px, 100%)",
           zIndex: 40,
           display: "flex",

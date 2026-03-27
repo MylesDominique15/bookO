@@ -183,13 +183,13 @@ function NavHint({ onNext, onPrev, activeIndex, total }) {
 // ─── Main Read Page ───────────────────────────────────────────────────────────
 export default function Read() {
   const navigate = useNavigate();
-  const { font, toggleFont, FONTS: FONT_OPTIONS, cycleTheme, theme } =
-    useTheme();
+  const { cycleTheme, theme } = useTheme();
   const { extractedText, documentTitle } = useContext(ReaderContext);
 
   // ── STATE & LOGIC: UNCHANGED ───────────────────────────────────────────────
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
+  const [isOD, setIsOD] = useState(false);
 
   const trimmedExtracted = (extractedText || "").trim();
   const textToRender =
@@ -237,8 +237,6 @@ export default function Read() {
   const progressPct = lines.length > 1
     ? Math.round((activeLineIndex / (lines.length - 1)) * 100)
     : 0;
-
-  const isOD = font === FONT_OPTIONS.OPEN_DYSLEXIC;
 
   const themeModeIcon =
     theme === THEMES.DARK ? (
@@ -314,6 +312,7 @@ const overlayStyle =
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
+    fontFamily: "'Inter', 'Segoe UI', sans-serif",
   }}
 >
   {/* THEME OVERLAY */}
@@ -324,18 +323,6 @@ const overlayStyle =
 
   {/* CONTENT WRAPPER */}
   <div className="relative z-10 flex w-full">
-
-        {/* ── Green progress bar — fixed across very top ─────────────────── */}
-        <div className="fixed top-0 left-0 right-0 h-1 bg-green-100 z-50">
-          <div
-            className="h-full bg-green-500 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${progressPct}%` }}
-            role="progressbar"
-            aria-valuenow={progressPct}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          />
-        </div>
 
         {/* ── LEFT SIDEBAR ────────────────────────────────────────────────── */}
         <aside
@@ -363,7 +350,7 @@ const overlayStyle =
               icon={<Type size={14} />}
               label="OpenDyslexic"
               active={isOD}
-              onClick={toggleFont}
+              onClick={() => setIsOD((v) => !v)}
             />
             <SidebarToggle
               icon={<Volume2 size={14} />}
@@ -417,7 +404,7 @@ const overlayStyle =
             className="w-full max-w-3xl rounded-3xl shadow-2xl shadow-black px-10 pt-9 pb-10"
             style={{
               ...paperStyles,
-              fontFamily: isOD ? "OpenDyslexic, sans-serif" : "'Georgia', serif",
+              fontFamily: "'Georgia', serif",
             }}
           >
             {/* Document header */}
@@ -460,19 +447,24 @@ const overlayStyle =
 
             {/* Rendered lines */}
             {isReady && (
-              <div role="article" className="flex flex-col gap-0.5">
+              <div
+                role="article"
+                className={`flex flex-col gap-0.5 ${isOD ? "dyslexic-text" : ""}`}
+                style={{
+                  fontFamily: isOD ? undefined : "'Georgia', serif",
+                }}
+              >
                 {lines.map((line, i) => (
                   <div
                     key={i}
                     ref={(el) => (lineRefs.current[i] = el)}
-                    className="read-line text-[17px] leading-loose px-3 py-1 cursor-default text-justify"
+                    className="read-line leading-loose px-3 py-1 cursor-default text-justify"
                     style={getLineStyle(i, activeLineIndex, theme)}
                     role="paragraph"
                     aria-current={i === activeLineIndex ? "true" : undefined}
                     onClick={() => {
                       if (i === activeLineIndex + 1) goToNext();
                       if (i === activeLineIndex - 1) goToPrev();
-                    textAlign: "justify"
                     }}
                   >
                     {line.text}

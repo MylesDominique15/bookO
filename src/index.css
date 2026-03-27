@@ -1,3 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: url('./assets/OpenDyslexic-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+.dyslexic-text {
+  font-family: 'OpenDyslexic', sans-serif;
+  /* ADJUST OPENDYSLEXIC FONT SIZE HERE */
+  font-size: 0.64em;
+}
+  
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
