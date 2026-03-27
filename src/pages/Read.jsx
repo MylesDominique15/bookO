@@ -46,32 +46,33 @@ implications for educators, interface designers, and anyone tasked with communic
 complex information to a human audience.`;
 
 // ─── Line highlight helper (uses inline styles for dynamic colors) ─────────────
-function getLineStyle(lineIndex, activeIndex) {
+function getLineStyle(lineIndex, activeIndex, theme) {
+  const isDark = theme === THEMES.DARK;
+
   if (lineIndex === activeIndex) {
     return {
-      background: "#f97316",       // orange-500
+      background: isDark ? "#1f2937" : "#354024",
       color: "#ffffff",
       borderRadius: "10px",
       transform: "scale(1.01)",
-      boxShadow: "0 4px 18px rgba(249,115,22,0.28)",
+      boxShadow: "0 4px 18px rgba(0, 0, 0, 0.28)",
       opacity: 1,
     };
   }
+
   if (lineIndex === activeIndex - 1 || lineIndex === activeIndex + 1) {
     return {
-      background: "#fed7aa",       // orange-200
-      color: "#7c2d12",            // orange-950
+      background: isDark ? "#374151" : "#747a67",
+      color: isDark ? "#e5e5e5" : "#000000",
       borderRadius: "10px",
-      transform: "scale(1)",
       opacity: 0.75,
     };
   }
+
   return {
     background: "transparent",
-    color: "#374151",              // gray-700
+    color: "inherit", 
     opacity: 0.25,
-    borderRadius: "10px",
-    transform: "scale(1)",
   };
 }
 
@@ -84,23 +85,23 @@ function SidebarToggle({ icon, label, active, onClick }) {
         "flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-sm font-semibold",
         "border transition-all duration-200 text-left",
         active
-          ? "bg-orange-400 text-white border-orange-400 shadow-md shadow-orange-200"
-          : "bg-white text-slate-600 border-orange-100 hover:border-orange-300 hover:text-orange-500",
+          ? "bg-[#3d3c22] text-white border-[#3d3c22] shadow-md shadow-black"
+          : "bg-[#605e34] text-white border-[#605e34] hover:border-[#3d3c22] hover:text-white",
       ].join(" ")}
     >
-      <span className={active ? "text-white" : "text-orange-400"}>{icon}</span>
+      <span className={active ? "text-white" : "text-white"}>{icon}</span>
       {label}
       {/* Pill indicator */}
       <span
         className={[
           "ml-auto w-8 h-4 rounded-full flex items-center px-0.5 transition-all duration-300",
-          active ? "bg-white/30 justify-end" : "bg-orange-100 justify-start",
+          active ? "bg-white/30 justify-end" : "bg-[#c8bea5] justify-start",
         ].join(" ")}
       >
         <span
           className={[
             "w-3 h-3 rounded-full transition-all duration-300",
-            active ? "bg-white" : "bg-orange-300",
+            active ? "bg-white" : "bg-white",
           ].join(" ")}
         />
       </span>
@@ -111,18 +112,12 @@ function SidebarToggle({ icon, label, active, onClick }) {
 // ─── Sprite ───────────────────────────────────────────────────────────────────
 function Sprite() {
   return (
-    <div className="flex flex-col items-center gap-1 py-2">
-      <div className="relative w-20 h-20">
-        {/* Outer glow ring */}
-        <div className="absolute inset-0 rounded-full bg-orange-200 animate-ping opacity-20" />
-        {/* Main circle */}
-        <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-orange-300 to-amber-400 flex flex-col items-center justify-center shadow-lg shadow-orange-300/40 border-2 border-orange-200">
-          <Sparkles size={22} className="text-white drop-shadow" />
-          <span className="text-[9px] font-black tracking-[0.18em] uppercase text-white/90 mt-0.5">
-            Sprite
-          </span>
-        </div>
-      </div>
+    <div className="flex justify-center">
+      <img
+        src="/images/read-mascot.png"
+        alt="sprite"
+        className="w-64 drop-shadow-[0_25px_40px_rgba(0,0,0,0.45)]"
+      />
     </div>
   );
 }
@@ -130,27 +125,27 @@ function Sprite() {
 // ─── Completion banner ────────────────────────────────────────────────────────
 function CompletionBanner({ onAssessment, onRestart }) {
   return (
-    <div className="mt-10 bg-orange-50 border border-orange-200 rounded-3xl p-8 flex flex-col items-center gap-5 shadow-lg shadow-orange-100 animate-[fadeSlideUp_0.5s_ease_forwards]">
-      <div className="w-14 h-14 rounded-full bg-orange-100 border-2 border-orange-300 flex items-center justify-center">
-        <BookMarked size={24} className="text-orange-500" />
+    <div className="mt-10 bg-[#9d9167] border border-[#9d9167] rounded-3xl p-8 flex flex-col items-center gap-5 shadow-lg shadow-[#3d3c22] animate-[fadeSlideUp_0.5s_ease_forwards]">
+      <div className="w-14 h-14 rounded-full bg-[#3d3c22] border-2 border-[#3d3c22] flex items-center justify-center">
+        <BookMarked size={24} className="text-white" />
       </div>
       <div className="text-center">
-        <p className="text-lg font-bold text-slate-800 mb-1">You've reached the end!</p>
-        <p className="text-sm text-slate-500 max-w-xs leading-relaxed">
+        <p className="text-lg font-bold text-[white] mb-1">You've reached the end!</p>
+        <p className="text-sm text-[#fff8df] max-w-xs leading-relaxed">
           Excellent focus session. Ready to test your comprehension?
         </p>
       </div>
       <div className="flex gap-3 flex-wrap justify-center w-full">
         <button
           onClick={onAssessment}
-          className="flex items-center gap-2 px-6 py-3 rounded-full bg-orange-400 hover:bg-orange-500 active:scale-95 text-white text-sm font-bold shadow-lg shadow-orange-200 transition-all duration-150"
+          className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#605e34] hover:bg-[#3d3c22] active:scale-95 text-white text-sm font-bold shadow-lg shadow-[#3d3c22] transition-all duration-150"
         >
           <ClipboardList size={15} />
           Take Reading Assessment
         </button>
         <button
           onClick={onRestart}
-          className="flex items-center gap-2 px-5 py-3 rounded-full bg-white border border-orange-200 hover:border-orange-400 text-slate-600 hover:text-orange-500 text-sm font-medium transition-all duration-150"
+          className="flex items-center gap-2 px-5 py-3 rounded-full bg-white border border-[white] hover:border-[#3d3c22] text-slate-600 hover:text-slate-600 text-sm font-medium transition-all duration-150"
         >
           <RotateCcw size={14} />
           Back to Start
@@ -163,21 +158,21 @@ function CompletionBanner({ onAssessment, onRestart }) {
 // ─── Nav hint bar ─────────────────────────────────────────────────────────────
 function NavHint({ onNext, onPrev, activeIndex, total }) {
   return (
-    <div className="flex items-center justify-between mt-6 px-4 py-3 rounded-2xl bg-orange-50 border border-orange-100">
+    <div className="flex items-center justify-between mt-6 px-4 py-3 rounded-2xl bg-[#d1c394] border border-[#c8bea5]">
       <button
         onClick={onPrev}
         disabled={activeIndex === 0}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#605e34] hover:text-[black] disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150"
       >
         <ChevronUp size={13} /> Prev
       </button>
-      <span className="text-[11px] text-slate-400 font-medium">
-        Line {activeIndex + 1} of {total} · <kbd className="font-semibold text-orange-400">Space</kbd> or <kbd className="font-semibold text-orange-400">↓</kbd> to advance
+      <span className="text-[11px] text-white font-medium">
+        Line {activeIndex + 1} of {total} · <kbd className="font-semibold text-[#747a67]">Space</kbd> or <kbd className="font-semibold text-[#747a67]">↓</kbd> to advance
       </span>
       <button
         onClick={onNext}
         disabled={activeIndex >= total - 1}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-orange-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#605e34] hover:text-[black] disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150"
       >
         Next <ChevronDown size={13} />
       </button>
@@ -268,6 +263,35 @@ export default function Read() {
     });
   };
 
+const paperStyles =
+  theme === THEMES.DARK
+    ? {
+        backgroundColor: "#1a1a1a",
+        color: "#e5e5e5",
+      }
+    : theme === THEMES.READING
+    ? {
+        backgroundColor: "#fff2dc", // warm paper
+        color: "#3d3c22",
+      }
+    : {
+        backgroundColor: "#ffffff",
+        color: "#1f2937",
+      };
+
+const overlayStyle =
+  theme === THEMES.DARK
+    ? {
+        backgroundColor: "rgba(0, 0, 0, 0.55)", // dim whole UI
+      }
+    : theme === THEMES.READING
+    ? {
+        backgroundColor: "rgba(255, 244, 214, 0.35)", // warm tone
+      }
+    : {
+        backgroundColor: "transparent",
+      };
+
   return (
     <>
       <style>{`
@@ -283,7 +307,23 @@ export default function Read() {
       `}</style>
 
       {/* ── Full page shell ─────────────────────────────────────────────── */}
-      <div className="flex h-screen overflow-hidden bg-orange-50/60">
+      <div
+  className="relative flex h-screen overflow-hidden"
+  style={{
+    backgroundImage: "url('/images/bg.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  }}
+>
+  {/* THEME OVERLAY */}
+  <div
+    className="absolute inset-0 pointer-events-none z-0 transition-all duration-300"
+    style={overlayStyle}
+  />
+
+  {/* CONTENT WRAPPER */}
+  <div className="relative z-10 flex w-full">
 
         {/* ── Green progress bar — fixed across very top ─────────────────── */}
         <div className="fixed top-0 left-0 right-0 h-1 bg-green-100 z-50">
@@ -299,14 +339,14 @@ export default function Read() {
 
         {/* ── LEFT SIDEBAR ────────────────────────────────────────────────── */}
         <aside
-          className="w-56 flex-shrink-0 flex flex-col bg-amber-100/70 border-r border-orange-200/60 px-4 py-6 gap-5 overflow-y-auto pt-5"
+          className="w-64 flex-shrink-0 flex flex-col bg-[#9d9167]/90 backdrop-blur-md rounded-r-3xl px-5 py-6 gap-5 overflow-y-auto shadow-[8px_0_25px_rgba(0,0,0,0.25)]"
           aria-label="Reading controls"
         >
           {/* Back arrow */}
           <button
             onClick={() => navigate("/")}
             aria-label="Back to home"
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-orange-200 text-orange-400 hover:bg-orange-400 hover:text-white hover:border-orange-400 shadow-sm transition-all duration-200 self-start"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-[#615e3a] border border-[#615e3a] text-[#9d9167] hover:bg-[#615e3a] hover:text-[#c8bea5] hover:border-[#615e3a] shadow-sm transition-all duration-200 self-start"
           >
             <ArrowLeft size={16} />
           </button>
@@ -315,7 +355,7 @@ export default function Read() {
           <Sprite />
 
           {/* Divider */}
-          <div className="h-px bg-orange-200/60 mx-1" />
+          <div className="h-px bg-[#625528] mx-1" />
 
           {/* Toggle buttons */}
           <div className="flex flex-col gap-2">
@@ -375,30 +415,31 @@ export default function Read() {
 
           {/* ── Document "paper" card ───────────────────────────────────── */}
           <div
-            className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl shadow-orange-100/80 px-10 pt-9 pb-10"
+            className="w-full max-w-3xl rounded-3xl shadow-2xl shadow-black px-10 pt-9 pb-10"
             style={{
+              ...paperStyles,
               fontFamily: isOD ? "'OpenDyslexic', sans-serif" : "'Georgia', serif",
             }}
           >
             {/* Document header */}
-            <header className="mb-6 border-b border-orange-100 pb-5">
-              <p className="text-[10px] font-extrabold tracking-[0.16em] uppercase text-orange-300 mb-1.5">
+            <header className="mb-6 border-b border-black pb-5">
+              <p className="text-[10px] font-extrabold tracking-[0.16em] uppercase mb-1.5 opacity-70">
                 Academic Reading
               </p>
-              <h1 className="text-2xl font-bold text-slate-800 leading-tight tracking-tight">
+              <h1 className="text-2xl font-bold leading-tight tracking-tight">
                 {documentTitle || "bookO"}
               </h1>
 
               {/* Progress bar inside card */}
               {isReady && lines.length > 0 && (
                 <div className="flex items-center gap-3 mt-4">
-                  <div className="flex-1 h-1.5 bg-orange-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 border border-[#9d9167] rounded-full overflow-hidden bg-transparent">
                     <div
-                      className="h-full bg-orange-400 rounded-full transition-all duration-500 ease-out"
+                      className="h-full bg-[#354024] rounded-full transition-all duration-500 ease-out"
                       style={{ width: `${progressPct}%` }}
                     />
                   </div>
-                  <span className="text-[11px] text-orange-400 font-bold tabular-nums min-w-[32px] text-right">
+                  <span className="text-[11px] font-bold tabular-nums min-w-[32px] text-right opacity-80">
                     {progressPct}%
                   </span>
                 </div>
@@ -411,7 +452,7 @@ export default function Read() {
                 {[...Array(7)].map((_, i) => (
                   <div
                     key={i}
-                    className="h-5 bg-orange-50 rounded-lg"
+                    className="h-5 bg-black rounded-lg"
                     style={{ width: i % 3 === 2 ? "55%" : "100%" }}
                   />
                 ))}
@@ -425,13 +466,14 @@ export default function Read() {
                   <div
                     key={i}
                     ref={(el) => (lineRefs.current[i] = el)}
-                    className="read-line text-[17px] leading-loose px-3 py-1 cursor-default"
-                    style={getLineStyle(i, activeLineIndex)}
+                    className="read-line text-[17px] leading-loose px-3 py-1 cursor-default text-justify"
+                    style={getLineStyle(i, activeLineIndex, theme)}
                     role="paragraph"
                     aria-current={i === activeLineIndex ? "true" : undefined}
                     onClick={() => {
                       if (i === activeLineIndex + 1) goToNext();
                       if (i === activeLineIndex - 1) goToPrev();
+                    textAlign: "justify"
                     }}
                   >
                     {line.text}
@@ -463,6 +505,7 @@ export default function Read() {
         {isDictionaryOpen && (
           <DictionaryPanel onClose={() => setIsDictionaryOpen(false)} />
         )}
+      </div>
       </div>
     </>
   );

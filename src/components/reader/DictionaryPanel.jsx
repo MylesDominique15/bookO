@@ -99,9 +99,9 @@ export default function DictionaryPanel({ onClose }) {
           zIndex: 40,
           display: "flex",
           flexDirection: "column",
-          background: "var(--color-surface)",
-          borderLeft: "1px solid var(--color-border)",
-          boxShadow: "-8px 0 32px rgba(15, 23, 42, 0.08)",
+          background: "#eae0c8",
+          borderLeft: "1px solid #eae0c8",
+          boxShadow: "-8px 0 32px rgba(0, 0, 0, 0.08)",
           fontFamily: "var(--font-family, inherit)",
         }}
       >
@@ -111,18 +111,18 @@ export default function DictionaryPanel({ onClose }) {
             alignItems: "center",
             gap: "10px",
             padding: "16px 14px 14px",
-            borderBottom: "1px solid var(--color-border)",
-            background: "var(--color-bg)",
+            borderBottom: "1px solid #eae0c8",
+            background: "#eae0c8",
             flexShrink: 0,
           }}
         >
-          <Book size={20} color="var(--color-accent)" aria-hidden />
+          <Book size={20} color="#354024" aria-hidden />
           <h2
             style={{
               margin: 0,
               fontSize: "15px",
               fontWeight: 700,
-              color: "var(--color-text)",
+              color: "#354024",
               flex: 1,
             }}
           >
@@ -139,9 +139,9 @@ export default function DictionaryPanel({ onClose }) {
               width: 36,
               height: 36,
               borderRadius: "10px",
-              border: "1px solid var(--color-border)",
-              background: "var(--color-surface)",
-              color: "var(--color-text)",
+              border: "1px solid #354024",
+              background: "#354024",
+              color: "#eae0c8",
               cursor: "pointer",
             }}
           >
@@ -155,7 +155,7 @@ export default function DictionaryPanel({ onClose }) {
             display: "flex",
             gap: "8px",
             padding: "14px",
-            borderBottom: "1px solid var(--color-border)",
+            borderBottom: "1px solid #a1967d",
             flexShrink: 0,
           }}
         >
@@ -170,9 +170,9 @@ export default function DictionaryPanel({ onClose }) {
               minWidth: 0,
               padding: "10px 12px",
               borderRadius: "10px",
-              border: "1px solid var(--color-border)",
-              background: "var(--color-bg)",
-              color: "var(--color-text)",
+              border: "1px solid #fff7e5",
+              background: "#fff7e5",
+              color: "#817969",
               fontSize: "14px",
             }}
           />
@@ -190,9 +190,9 @@ export default function DictionaryPanel({ onClose }) {
               border: "none",
               background:
                 status === "loading" || !query.trim()
-                  ? "var(--color-border)"
-                  : "var(--color-accent)",
-              color: "#fff",
+                  ? "#fff7e5"
+                  : "#fff7e5",
+              color: "#354024",
               cursor:
                 status === "loading" || !query.trim()
                   ? "not-allowed"
@@ -280,7 +280,7 @@ export default function DictionaryPanel({ onClose }) {
                     style={{
                       margin: 0,
                       fontSize: "14px",
-                      color: "var(--color-accent)",
+                      color: "#817969",
                       fontWeight: 600,
                     }}
                   >
@@ -308,7 +308,7 @@ export default function DictionaryPanel({ onClose }) {
                           fontWeight: 700,
                           letterSpacing: "0.06em",
                           textTransform: "uppercase",
-                          color: "var(--color-accent)",
+                          color: "#817969",
                           marginBottom: "6px",
                         }}
                       >

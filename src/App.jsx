@@ -35,7 +35,7 @@ function Navbar() {
         style={{
           position: "fixed",
           top: 0,
-          left: 220, // sidebar width
+          left: 5, // sidebar width
           right: 0,
           height: "40px",
           background: "var(--color-bg)",
@@ -66,29 +66,22 @@ function Navbar() {
   }
 
   return (
-    <nav
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 200,
-        background: "var(--color-bg)",
-        borderBottom: "1px solid var(--color-border)",
-        fontFamily,
-        backdropFilter: "blur(8px)",
-      }}
-      aria-label="Main navigation"
-    >
-      <div
-        style={{
-          maxWidth: "1100px",
-          margin: "0 auto",
-          padding: "0 24px",
-          height: "56px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+    <div
+  style={{
+    position: "relative",
+    margin: "20px auto",
+    maxWidth: "1100px",
+    padding: "14px 20px",
+    borderRadius: "20px",
+    background: "#fff4e4",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    fontFamily,
+  }}
+>
         {/* Brand */}
         <NavLink
           to="/"
@@ -99,34 +92,30 @@ function Navbar() {
             textDecoration: "none",
           }}
         >
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "50%",
-              border: `1.5px solid ${styles.accent}`,
-              background: `${styles.accent}18`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Sparkles size={13} color={styles.accent} />
-          </div>
           <span
             style={{
-              fontSize: "15px",
-              fontWeight: "800",
-              color: "var(--color-text)",
-              letterSpacing: "-0.02em",
+            fontSize: "22px",
+            fontWeight: "900",
+            color: "#4b3f2f",
+            letterSpacing: "-0.02em",
             }}
           >
-            bookO
+          book<span style={{ color: "#6b7a3d" }}>O</span>
           </span>
         </NavLink>
 
         {/* Nav links */}
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            background: "rgba(255,255,255,0.5)",
+            padding: "6px",
+            borderRadius: "16px",
+          }}
+        >
+
           {NAV_ITEMS.map(({ path, label, icon: Icon }) => (
             <NavLink
               key={path}
@@ -136,13 +125,18 @@ function Navbar() {
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
-                padding: "7px 14px",
-                borderRadius: "9px",
+                
                 textDecoration: "none",
                 fontSize: "13px",
                 fontWeight: isActive ? "700" : "500",
                 color: isActive ? styles.accent : "var(--color-subtext)",
-                background: isActive ? `${styles.accent}14` : "transparent",
+                
+                padding: "8px 16px",
+                borderRadius: "14px",
+                background: isActive ? "#c8bea5" : "transparent",
+                color: isActive ? "#3d3c22" : "#5c5c5c",
+                fontWeight: isActive ? "700" : "500",
+
                 transition: "all 0.18s ease",
                 letterSpacing: isActive ? "-0.01em" : "0",
               })}
@@ -153,7 +147,6 @@ function Navbar() {
           ))}
         </div>
       </div>
-    </nav>
   );
 }
 
@@ -173,6 +166,7 @@ function AppShell() {
       data-theme={theme}
     >
       <Navbar />
+
       <main
         style={{
           paddingTop: isReadPage ? "40px" : "0",
