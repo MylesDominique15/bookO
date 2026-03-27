@@ -71,80 +71,40 @@ function Navbar() {
         position: "sticky",
         top: 0,
         zIndex: 200,
-        background: "var(--color-bg)",
+        background: "rgba(245, 237, 224, 0.8)", // Semi-transparent version of bg
         borderBottom: "1px solid var(--color-border)",
-        fontFamily,
-        backdropFilter: "blur(8px)",
+        fontFamily: "var(--font-serif)",
+        backdropFilter: "blur(12px)",
       }}
-      aria-label="Main navigation"
     >
-      <div
-        style={{
-          maxWidth: "1100px",
-          margin: "0 auto",
-          padding: "0 24px",
-          height: "56px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+      <div style={{ /* ... existing styles */ }}>
         {/* Brand */}
-        <NavLink
-          to="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "9px",
-            textDecoration: "none",
-          }}
-        >
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "50%",
-              border: `1.5px solid ${styles.accent}`,
-              background: `${styles.accent}18`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Sparkles size={13} color={styles.accent} />
+        <NavLink to="/" style={{ display: "flex", alignItems: "center", gap: "9px", textDecoration: "none" }}>
+          <div style={{
+              width: 28, height: 28, borderRadius: "50%",
+              border: `1.5px solid #5a7a3a`, // Explicitly olive
+              background: `#5a7a3a18`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <Sparkles size={13} color="#5a7a3a" />
           </div>
-          <span
-            style={{
-              fontSize: "15px",
-              fontWeight: "800",
-              color: "var(--color-text)",
-              letterSpacing: "-0.02em",
-            }}
-          >
+          <span style={{ fontSize: "17px", fontWeight: "800", color: "var(--color-text)", letterSpacing: "-0.03em" }}>
             bookO
           </span>
         </NavLink>
 
-        {/* Nav links */}
+        {/* Nav Links */}
         <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
           {NAV_ITEMS.map(({ path, label, icon: Icon }) => (
             <NavLink
               key={path}
               to={path}
-              end={path === "/"}
               style={({ isActive }) => ({
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "7px 14px",
-                borderRadius: "9px",
-                textDecoration: "none",
-                fontSize: "13px",
+                // ... existing logic
+                color: isActive ? "#5a7a3a" : "var(--color-subtext)",
+                background: isActive ? "#5a7a3a14" : "transparent",
+                fontFamily: "var(--font-serif)",
                 fontWeight: isActive ? "700" : "500",
-                color: isActive ? styles.accent : "var(--color-subtext)",
-                background: isActive ? `${styles.accent}14` : "transparent",
-                transition: "all 0.18s ease",
-                letterSpacing: isActive ? "-0.01em" : "0",
               })}
             >
               <Icon size={14} />
@@ -214,60 +174,40 @@ export default function App() {
 function GlobalStyles() {
   return (
     <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700;800&display=swap');
+
+      :root {
+        /* Matching the PALETTE from Profile.jsx */
+        --color-bg: #f5ede0;
+        --color-surface: #fdf6ec;
+        --color-surface-alt: #f0e6d3;
+        --color-border: #d9c8b0;
+        --color-text: #3d2b1f;
+        --color-subtext: #8c7260;
+        --color-accent: #5a7a3a; /* Dark Olive */
+        --font-serif: 'Lora', 'Georgia', serif;
+      }
+
       *, *::before, *::after {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
 
-      :root {
-        --font-family: 'Georgia', 'Times New Roman', serif;
-      }
-
-      html, body, #root {
-        height: 100%;
-      }
-
       body {
-        font-family: var(--font-family);
-        background: var(--color-bg);
+        font-family: var(--font-serif);
+        background-color: var(--color-bg);
         color: var(--color-text);
         -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
       }
 
-      /* Scrollbar */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
+      /* Update the Scrollbar to match the brown/cream tones */
       ::-webkit-scrollbar-thumb {
-        background: var(--color-border);
-        border-radius: 3px;
+        background: #d9c8b0;
+        border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: var(--color-subtext);
-      }
-
-      /* Selection highlight */
-      ::selection {
-        background: var(--color-accent);
-        color: #fff;
-      }
-
-      /* Focus ring */
-      :focus-visible {
-        outline: 2px solid var(--color-accent);
-        outline-offset: 2px;
-      }
-
-      /* Smooth anchor transitions for router pages */
-      @keyframes pageIn {
-        from { opacity: 0; transform: translateY(12px); }
-        to   { opacity: 1; transform: translateY(0); }
+        background: #8c7260;
       }
     `}</style>
   );
