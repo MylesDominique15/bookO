@@ -43,7 +43,7 @@ function Navbar() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 100,
+          zIndex: 9999,
           fontFamily,
         }}
       >
@@ -69,7 +69,7 @@ function Navbar() {
     <div
   style={{
     position: "relative",
-    margin: "20px auto",
+    margin: "40px auto",
     maxWidth: "1100px",
     padding: "14px 20px",
     borderRadius: "20px",
@@ -80,6 +80,7 @@ function Navbar() {
     alignItems: "center",
     justifyContent: "space-between",
     fontFamily,
+    zIndex: 1000,
   }}
 >
         {/* Brand */}

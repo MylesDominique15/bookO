@@ -6,13 +6,27 @@ import {
   XCircle,
   BarChart3,
   RefreshCw,
-  Sparkles,
   Trophy,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { ReaderContext } from "../context/ReaderContext";
 
-// ─── Sample quiz (fixed questions; no external API) ────────────────────────────
+// ─── Color palette ────────────────────────────────────────────────────────────
+const P = {
+  bg:          "#f5ede0",
+  surface:     "#fdf6ec",
+  surfaceCard: "#ede0cc",
+  border:      "#d9c8b0",
+  text:        "#3d2b1f",
+  subtext:     "#0c0906",
+  accent:      "#5a7a3a",
+  brown:       "#7a4f2e",
+  brownDark:   "#5c3318",
+  cream:       "#e8dcc8",
+  green:       "#4a6e2a",
+  red:         "#b84a3a",
+};
+
 const SAMPLE_QUIZ = [
   {
     id: 1,
@@ -76,29 +90,76 @@ const SAMPLE_QUIZ = [
   },
 ];
 
-// ─── Option button ────────────────────────────────────────────────────────────
-function OptionButton({ label, index, selected, correct, revealed, onSelect, styles }) {
-  let bg = "var(--color-surface)";
-  let border = "var(--color-border)";
-  let color = "var(--color-text)";
-  let icon = null;
+function LibraryBackground() {
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
+      {/* 1. Base Gradient - Keeps the warm tone behind the transparency */}
+      <div style={{ 
+        position: "absolute", 
+        inset: 0, 
+        background: "radial-gradient(ellipse at 50% 0%, #ede0cc 0%, #f5ede0 50%, #ead5b8 100%)" 
+      }} />
+
+      {/* 2. RESPONSIVE BACKGROUND IMAGE */}
+      <img 
+        src="/images/bg.png" 
+        alt="Library Background"
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",      /* Changed from auto to 100% */
+          opacity: 0.35,
+          objectFit: "cover",   /* This ensures it scales like a background-size: cover */
+          objectPosition: "bottom center", /* Keeps the bookshelves at the bottom */
+          filter: "blur(0.5px)" 
+        }}
+      />
+
+      {/* 3. Grain Overlay - Makes the digital image look like real paper */}
+      <div style={{ 
+        position: "absolute", 
+        inset: 0, 
+        backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")", 
+        opacity: 0.4 
+      }} />
+    </div>
+  );
+}
+
+function MascotArmsUp({ size = 150 }) {
+  return (
+    <div style={{ width: size, height: 'auto', animation: "float 3s ease-in-out infinite" }}>
+      <img src="/char1.png" alt="Mascot" style={{ width: '100%', height: 'auto', display: 'block' }} />
+    </div>
+  );
+}
+
+function MascotSmall({ size = 70 }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.15))" }}>
+      <img src="/char3.png" alt="icon" style={{ width: size, height: 'auto', objectFit: 'contain', display: 'block', transform: "translateY(-2px)" }} />
+    </div>
+  );
+}
+
+function OptionButton({ label, index, selected, correct, revealed, onSelect }) {
+  let bg     = P.surface;
+  let border = P.border;
+  let color  = P.text;
+  let icon   = null;
 
   if (revealed) {
     if (index === correct) {
-      bg = "#22c55e18";
-      border = "#22c55e88";
-      color = "#16a34a";
-      icon = <CheckCircle2 size={15} color="#22c55e" />;
+      bg = "#4a6e2a14"; border = "#4a6e2a88"; color = P.green;
+      icon = <CheckCircle2 size={15} color={P.green}/>;
     } else if (index === selected && index !== correct) {
-      bg = "#ef444418";
-      border = "#ef444488";
-      color = "#dc2626";
-      icon = <XCircle size={15} color="#ef4444" />;
+      bg = "#b84a3a14"; border = "#b84a3a88"; color = P.red;
+      icon = <XCircle size={15} color={P.red}/>;
     }
   } else if (index === selected) {
-    bg = `${styles.accent}18`;
-    border = `${styles.accent}88`;
-    color = styles.accent;
+    bg = `${P.brown}18`; border = `${P.brown}88`; color = P.brown;
   }
 
   return (
@@ -111,359 +172,124 @@ function OptionButton({ label, index, selected, correct, revealed, onSelect, sty
         gap: "12px",
         width: "100%",
         padding: "13px 16px",
-        borderRadius: "10px",
+        borderRadius: "12px",
         border: `1.5px solid ${border}`,
         background: bg,
         color,
         cursor: revealed ? "default" : "pointer",
-        fontSize: "14px",
-        fontWeight: index === selected || (revealed && index === correct) ? "600" : "400",
+        fontSize: "15px",
+        fontWeight: (index === selected || (revealed && index === correct)) ? "600" : "400",
         textAlign: "left",
         transition: "all 0.2s ease",
         lineHeight: "1.5",
+        fontFamily: "Sans-Serif", /* Matches Genty Sans */
       }}
     >
       <span
         style={{
-          width: 24,
-          height: 24,
+          width: 26,
+          height: 26,
           borderRadius: "50%",
           border: `1.5px solid ${border}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "11px",
+          fontSize: "13px",
           fontWeight: "700",
           flexShrink: 0,
-          background: index === selected && !revealed ? styles.accent : "transparent",
+          background: index === selected && !revealed ? P.brown : "transparent",
           color: index === selected && !revealed ? "#fff" : "inherit",
+          fontFamily: "'Fredoka', sans-serif",
         }}
       >
-        {icon || ["A", "B", "C", "D"][index]}
+        {icon || ["A","B","C","D"][index]}
       </span>
       {label}
     </button>
   );
 }
 
-// ─── Quiz card ────────────────────────────────────────────────────────────────
-function QuizCard({ question, qIndex, total, answer, onAnswer, onNext, isLast, styles }) {
-  const revealed = answer !== undefined && answer !== null;
-  const isCorrect = revealed && answer === question.correctIndex;
+function QuizCard({ question, qIndex, total, answer, onAnswer, onNext, isLast }) {
+  const revealed   = answer !== undefined && answer !== null;
+  const isCorrect  = revealed && answer === question.correctIndex;
 
   return (
-    <div
-      style={{
-        background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "16px",
-        padding: "28px 28px 24px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "20px",
-        animation: "cardIn 0.35s ease forwards",
-      }}
-    >
-      {/* Progress chip */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <span
-          style={{
-            fontSize: "11px",
-            fontWeight: "700",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: styles.accent,
-          }}
-        >
+    <div style={{ background: P.surface, border: `1px solid ${P.border}`, borderRadius: "24px", padding: "28px 28px 24px", display: "flex", flexDirection: "column", gap: "20px", boxShadow: "0 4px 24px rgba(90,60,30,0.10)", animation: "cardIn 0.35s ease forwards" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontSize: "12px", fontWeight: "600", letterSpacing: "0.05em", textTransform: "uppercase", color: P.brown, fontFamily: "'Fredoka', sans-serif" }}>
           Question {qIndex + 1} of {total}
         </span>
-        <div
-          style={{
-            display: "flex",
-            gap: "4px",
-          }}
-        >
+        <div style={{ display: "flex", gap: "4px" }}>
           {Array.from({ length: total }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: 20,
-                height: 4,
-                borderRadius: "2px",
-                background:
-                  i < qIndex
-                    ? styles.accent
-                    : i === qIndex
-                    ? `${styles.accent}66`
-                    : "var(--color-border)",
-                transition: "background 0.3s",
-              }}
-            />
+            <div key={i} style={{ width: 24, height: 6, borderRadius: "3px", background: i < qIndex ? P.brown : i === qIndex ? `${P.brown}66` : P.border, transition: "background 0.3s" }} />
           ))}
         </div>
       </div>
-
-      {/* Question */}
-      <p
-        style={{
-          fontSize: "17px",
-          fontWeight: "600",
-          color: "var(--color-text)",
-          lineHeight: "1.55",
-          letterSpacing: "-0.01em",
-        }}
-      >
+      <p style={{ fontSize: "19px", fontWeight: "600", color: P.text, lineHeight: "1.4", fontFamily: "'Fredoka', sans-serif" }}>
         {question.question}
       </p>
-
-      {/* Options */}
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {question.options.map((opt, i) => (
-          <OptionButton
-            key={i}
-            label={opt}
-            index={i}
-            selected={answer}
-            correct={question.correctIndex}
-            revealed={revealed}
-            onSelect={onAnswer}
-            styles={styles}
-          />
+          <OptionButton key={i} label={opt} index={i} selected={answer} correct={question.correctIndex} revealed={revealed} onSelect={onAnswer} />
         ))}
       </div>
-
-      {/* Explanation */}
       {revealed && (
-        <div
-          style={{
-            padding: "12px 14px",
-            borderRadius: "10px",
-            background: isCorrect ? "#22c55e0e" : "#ef44440e",
-            border: `1px solid ${isCorrect ? "#22c55e33" : "#ef444433"}`,
-            animation: "fadeIn 0.3s ease",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "13px",
-              color: isCorrect ? "#16a34a" : "#dc2626",
-              fontWeight: "600",
-              marginBottom: "4px",
-            }}
-          >
+        <div style={{ padding: "12px 16px", borderRadius: "12px", background: isCorrect ? "#4a6e2a10" : "#b84a3a10", border: `1px solid ${isCorrect ? "#4a6e2a40" : "#b84a3a40"}`, animation: "fadeIn 0.3s ease" }}>
+          <p style={{ fontSize: "14px", color: isCorrect ? P.green : P.red, fontWeight: "700", marginBottom: "4px", fontFamily: "'Fredoka', sans-serif" }}>
             {isCorrect ? "✓ Correct!" : "✗ Incorrect"}
           </p>
-          <p
-            style={{
-              fontSize: "13px",
-              color: "var(--color-text)",
-              lineHeight: "1.55",
-            }}
-          >
+          <p style={{ fontSize: "14px", color: P.text, lineHeight: "1.5", fontFamily: "Sans-Serif" }}>
             {question.explanation}
           </p>
         </div>
       )}
-
-      {/* Next button */}
       {revealed && (
-        <button
-          onClick={onNext}
-          style={{
-            alignSelf: "flex-end",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "11px 22px",
-            borderRadius: "10px",
-            border: "none",
-            background: styles.accent,
-            color: "#fff",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: "600",
-            boxShadow: `0 3px 12px ${styles.accent}44`,
-            animation: "fadeIn 0.3s ease",
-          }}
-        >
-          {isLast ? (
-            <>
-              <Trophy size={15} />
-              See Results
-            </>
-          ) : (
-            <>Next Question</>
-          )}
+        <button onClick={onNext} style={{ alignSelf: "flex-end", display: "flex", alignItems: "center", gap: "8px", padding: "12px 24px", borderRadius: "50px", border: "none", background: P.brownDark, color: "#fff", cursor: "pointer", fontSize: "15px", fontWeight: "600", boxShadow: `0 4px 16px ${P.brownDark}55`, animation: "fadeIn 0.3s ease", fontFamily: "'Fredoka', sans-serif", transition: "opacity 0.15s ease" }} onMouseEnter={e => e.currentTarget.style.opacity = "0.88"} onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
+          {isLast ? <><Trophy size={16}/> See Results</> : <>Next Question</>}
         </button>
       )}
     </div>
   );
 }
 
-// ─── Results screen ───────────────────────────────────────────────────────────
-function ResultsScreen({ questions, answers, onRetry, onViewStats, styles }) {
+function ResultsScreen({ questions, answers, onRetry, onViewStats }) {
   const score = answers.filter((a, i) => a === questions[i]?.correctIndex).length;
-  const pct = Math.round((score / questions.length) * 100);
-
-  const grade =
-    pct >= 80 ? { label: "Excellent", color: "#22c55e" }
-    : pct >= 60 ? { label: "Good", color: styles.accent }
-    : pct >= 40 ? { label: "Fair", color: "#f59e0b" }
-    : { label: "Needs Review", color: "#ef4444" };
+  const pct   = Math.round((score / questions.length) * 100);
+  const grade = pct >= 80 ? { label: "Excellent!", color: P.green } : pct >= 60 ? { label: "Good Job!", color: P.brown } : pct >= 40 ? { label: "Keep Going!", color: "#c97c3a" } : { label: "Needs Review", color: P.red };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "28px",
-        animation: "cardIn 0.4s ease forwards",
-      }}
-    >
-      <div
-        style={{
-          width: 100,
-          height: 100,
-          borderRadius: "50%",
-          background: `${grade.color}18`,
-          border: `2px solid ${grade.color}`,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: `0 0 0 8px ${grade.color}0e`,
-        }}
-      >
-        <span
-          style={{
-            fontSize: "28px",
-            fontWeight: "800",
-            color: grade.color,
-            lineHeight: 1,
-          }}
-        >
-          {pct}%
-        </span>
-        <span style={{ fontSize: "10px", color: grade.color, fontWeight: "600" }}>
-          {score}/{questions.length}
-        </span>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "28px", animation: "cardIn 0.4s ease forwards" }}>
+      <div style={{ width: 110, height: 110, borderRadius: "50%", background: `${grade.color}14`, border: `3px solid ${grade.color}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxShadow: `0 0 0 10px ${grade.color}0d` }}>
+        <span style={{ fontSize: "32px", fontWeight: "700", color: grade.color, lineHeight: 1, fontFamily: "'Fredoka', sans-serif" }}>{pct}%</span>
+        <span style={{ fontSize: "12px", color: grade.color, fontWeight: "600", fontFamily: "'Fredoka', sans-serif" }}>{score}/{questions.length}</span>
       </div>
-
       <div style={{ textAlign: "center" }}>
-        <p
-          style={{
-            fontSize: "22px",
-            fontWeight: "800",
-            color: "var(--color-text)",
-            marginBottom: "8px",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {grade.label}
-        </p>
-        <p style={{ fontSize: "14px", color: "var(--color-subtext)", lineHeight: 1.6 }}>
-          You answered {score} of {questions.length} questions correctly.
-        </p>
+        <p style={{ fontSize: "26px", fontWeight: "700", color: P.text, marginBottom: "8px", fontFamily: "'Fredoka', sans-serif" }}>{grade.label}</p>
+        <p style={{ fontSize: "15px", color: P.subtext, lineHeight: 1.6, fontFamily: "Sans-Serif" }}>You answered {score} of {questions.length} questions correctly.</p>
       </div>
-
-      {/* Per-question recap */}
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px",
-        }}
-      >
+      <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "8px" }}>
         {questions.map((q, i) => {
           const correct = answers[i] === q.correctIndex;
           return (
-            <div
-              key={q.id}
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "10px",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                border: "1px solid var(--color-border)",
-                background: "var(--color-surface)",
-              }}
-            >
-              {correct ? (
-                <CheckCircle2 size={16} color="#22c55e" style={{ flexShrink: 0, marginTop: 2 }} />
-              ) : (
-                <XCircle size={16} color="#ef4444" style={{ flexShrink: 0, marginTop: 2 }} />
-              )}
-              <p style={{ fontSize: "13px", color: "var(--color-text)", lineHeight: 1.5 }}>
-                {q.question}
-              </p>
+            <div key={q.id} style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "12px 16px", borderRadius: "16px", border: `1px solid ${P.border}`, background: P.surface, boxShadow: "0 1px 4px rgba(90,60,30,0.05)" }}>
+              {correct ? <CheckCircle2 size={18} color={P.green} style={{ flexShrink: 0, marginTop: 2 }}/> : <XCircle size={18} color={P.red} style={{ flexShrink: 0, marginTop: 2 }}/>}
+              <p style={{ fontSize: "14px", color: P.text, lineHeight: 1.5, fontFamily: "Sans-Serif" }}>{q.question}</p>
             </div>
           );
         })}
       </div>
-
       <div style={{ display: "flex", gap: "12px", width: "100%", flexWrap: "wrap" }}>
-        <button
-          onClick={onViewStats}
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-            padding: "13px 20px",
-            borderRadius: "11px",
-            border: "none",
-            background: styles.accent,
-            color: "#fff",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: "700",
-            boxShadow: `0 4px 16px ${styles.accent}44`,
-          }}
-        >
-          <BarChart3 size={15} />
-          View Statistics
-        </button>
-        <button
-          onClick={onRetry}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "13px 20px",
-            borderRadius: "11px",
-            border: "1px solid var(--color-border)",
-            background: "var(--color-surface)",
-            color: "var(--color-text)",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: "500",
-          }}
-        >
-          <RefreshCw size={14} />
-          Retry
-        </button>
+        <button onClick={onViewStats} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "14px 20px", borderRadius: "50px", border: "none", background: P.brownDark, color: "#fff", cursor: "pointer", fontSize: "15px", fontWeight: "600", boxShadow: `0 4px 16px ${P.brownDark}44`, fontFamily: "'Fredoka', sans-serif", transition: "opacity 0.15s ease" }} onMouseEnter={e => e.currentTarget.style.opacity = "0.88"} onMouseLeave={e => e.currentTarget.style.opacity = "1"}><BarChart3 size={16}/> View Statistics</button>
+        <button onClick={onRetry} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "14px 20px", borderRadius: "50px", border: `1.5px solid ${P.border}`, background: P.surface, color: P.text, cursor: "pointer", fontSize: "15px", fontWeight: "600", fontFamily: "'Fredoka', sans-serif", transition: "background 0.15s ease" }} onMouseEnter={e => e.currentTarget.style.background = P.surfaceCard} onMouseLeave={e => e.currentTarget.style.background = P.surface}><RefreshCw size={15}/> Retry</button>
       </div>
     </div>
   );
 }
 
-// ─── Assessment page ──────────────────────────────────────────────────────────
 export default function Assessment() {
   const navigate = useNavigate();
-  const { styles, fontFamily } = useTheme();
   const { documentTitle, addSessionResult } = useContext(ReaderContext);
-
-  const [status, setStatus] = useState("idle"); // idle | loading | ready | complete
+  const [status, setStatus] = useState("idle");
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
@@ -472,7 +298,7 @@ export default function Assessment() {
     setStatus("loading");
     setAnswers([]);
     setCurrentIndex(0);
-    await new Promise((r) => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, 700));
     setQuestions(SAMPLE_QUIZ);
     setStatus("ready");
   };
@@ -488,208 +314,101 @@ export default function Assessment() {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((i) => i + 1);
     } else {
-      // Save result to context
-      const score = answers.filter(
-        (a, i) => a === questions[i]?.correctIndex
-      ).length;
-      addSessionResult?.({
-        date: new Date().toISOString(),
-        score,
-        total: questions.length,
-        title: documentTitle || "Untitled",
-      });
+      const score = answers.filter((a, i) => a === questions[i]?.correctIndex).length;
+      addSessionResult?.({ date: new Date().toISOString(), score, total: questions.length, title: documentTitle || "Untitled" });
       setStatus("complete");
     }
   };
 
   const handleRetry = () => {
-    setStatus("idle");
-    setQuestions([]);
-    setAnswers([]);
-    setCurrentIndex(0);
+    setStatus("idle"); setQuestions([]); setAnswers([]); setCurrentIndex(0);
   };
 
   return (
     <>
       <style>{`
-        @keyframes cardIn {
-          from { opacity: 0; transform: translateY(18px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
+      <LibraryBackground />
 
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "var(--color-bg)",
-          fontFamily,
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          padding: "48px 24px 80px",
-        }}
-      >
-        <div style={{ width: "100%", maxWidth: "620px" }}>
+      <div style={{ 
+        minHeight: "100vh", 
+        fontFamily: "Sans-Serif", 
+        display: "flex", 
+        alignItems: "flex-start", 
+        justifyContent: "center", 
+        /* FIX 1: Increased paddingTop to 120px. 
+           This ensures the Floating Navbar has space and doesn't cover your header. 
+        */
+        padding: "50px 24px 80px", 
+        position: "relative", 
+        /* FIX 2: Ensure the content is zIndex 1 
+           so it stays behind the Navbar (which should be 1000 in App.jsx). 
+        */
+        zIndex: 1 
+      }}>
+        <div style={{ width: "100%", maxWidth: "640px", marginTop: "0" }}>
+          
           {/* Header */}
-          <header style={{ marginBottom: "36px", animation: "cardIn 0.4s ease" }}>
-            <p
-              style={{
-                fontSize: "11px",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "var(--color-subtext)",
-                fontWeight: "600",
-                marginBottom: "8px",
-              }}
-            >
+          <header style={{ 
+            marginBottom: "32px", 
+            animation: "cardIn 0.4s ease",
+            textAlign: "left" /* Matches the new brand alignment */
+          }}>
+            <p style={{ 
+              fontSize: "12px", 
+              letterSpacing: "0.1em", 
+              textTransform: "uppercase", 
+              color: P.brown, 
+              fontWeight: "600", 
+              marginBottom: "6px", 
+              fontFamily: "'Fredoka', sans-serif" 
+            }}>
               Comprehension Check
             </p>
-            <h1
-              style={{
-                fontSize: "26px",
-                fontWeight: "800",
-                color: "var(--color-text)",
-                letterSpacing: "-0.02em",
-                lineHeight: "1.2",
-              }}
-            >
+            <h1 style={{ 
+              fontSize: "36px", 
+              fontWeight: "700", 
+              color: P.text, 
+              letterSpacing: "-0.01em", 
+              lineHeight: "1.1", 
+              fontFamily: "'Fredoka', sans-serif" 
+            }}>
               {documentTitle || "Reading Assessment"}
             </h1>
           </header>
 
-          {/* Idle state */}
           {status === "idle" && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "24px",
-                padding: "48px 32px",
-                background: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "16px",
-                textAlign: "center",
-                animation: "cardIn 0.4s ease",
-              }}
-            >
-              <div
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: "50%",
-                  background: `${styles.accent}18`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Sparkles size={26} color={styles.accent} />
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", padding: "48px 36px 40px", background: "linear-gradient(160deg, #ede0cc 0%, #e6d4b8 100%)", border: `1px solid ${P.border}`, borderRadius: "24px", textAlign: "center", boxShadow: "0 6px 32px rgba(90,60,30,0.13)", animation: "cardIn 0.45s ease" }}>
+              <div style={{ animation: "float 3s ease-in-out infinite", marginBottom: "-10px" }}><MascotArmsUp size={220}/></div>
+              <div style={{ maxWidth: "400px" }}>
+                <p style={{ fontSize: "22px", fontWeight: "700", color: P.text, marginBottom: "8px", fontFamily: "'Fredoka', sans-serif" }}>Ready to test your comprehension?</p>
+                <p style={{ fontSize: "15px", color: P.subtext, lineHeight: 1.6, fontFamily: "Sans-Serif" }}>5 sample questions will be generated from your PDF.</p>
               </div>
-              <div>
-                <p
-                  style={{
-                    fontSize: "17px",
-                    fontWeight: "700",
-                    color: "var(--color-text)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Ready to test your comprehension?
-                </p>
-                <p
-                  style={{
-                    fontSize: "13px",
-                    color: "var(--color-subtext)",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Five sample multiple-choice questions on cognitive load theory —
-                  great for a quick comprehension check after reading.
-                </p>
+              <div style={{ position: "relative", width: "fit-content", marginTop: "16px", display: "flex", alignItems: "center" }}>
+                <div style={{ position: "absolute", left: "14px", top: "6.5px", zIndex: 10, pointerEvents: "none" }}><MascotSmall size={85} /></div>
+                <button onClick={startQuiz} style={{ padding: "14px 44px 14px 80px", borderRadius: "50px", border: "none", background: P.brownDark, color: "#fff", cursor: "pointer", fontSize: "20px", fontWeight: "600", fontFamily: "'Fredoka', sans-serif", boxShadow: `0 8px 24px ${P.brownDark}55`, transition: "all 0.2s ease" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.03)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}>Generate Quiz</button>
               </div>
-              <button
-                onClick={startQuiz}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "13px 28px",
-                  borderRadius: "11px",
-                  border: "none",
-                  background: styles.accent,
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: "700",
-                  boxShadow: `0 4px 16px ${styles.accent}44`,
-                }}
-              >
-                <Sparkles size={15} />
-                Generate Quiz
-              </button>
             </div>
           )}
 
-          {/* Loading */}
           {status === "loading" && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "16px",
-                padding: "64px 32px",
-                background: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "16px",
-                textAlign: "center",
-                animation: "cardIn 0.3s ease",
-              }}
-            >
-              <Loader2
-                size={32}
-                color={styles.accent}
-                style={{ animation: "spin 0.9s linear infinite" }}
-              />
-              <p style={{ fontSize: "15px", color: "var(--color-subtext)" }}>
-                Loading quiz…
-              </p>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px", padding: "64px 36px", background: "linear-gradient(160deg, #ede0cc 0%, #e6d4b8 100%)", border: `1px solid ${P.border}`, borderRadius: "24px", textAlign: "center", boxShadow: "0 6px 32px rgba(90,60,30,0.13)", animation: "cardIn 0.3s ease" }}>
+              <Loader2 size={36} color={P.brownDark} style={{ animation: "spin 0.9s linear infinite" }} />
+              <p style={{ fontSize: "16px", color: P.subtext, fontFamily: "'Fredoka', sans-serif" }}>Preparing your quiz…</p>
             </div>
           )}
 
-          {/* Active quiz */}
-          {status === "ready" && questions.length > 0 && (
-            <QuizCard
-              key={currentIndex}
-              question={questions[currentIndex]}
-              qIndex={currentIndex}
-              total={questions.length}
-              answer={answers[currentIndex]}
-              onAnswer={handleAnswer}
-              onNext={handleNext}
-              isLast={currentIndex === questions.length - 1}
-              styles={styles}
-            />
-          )}
+          {status === "ready" && questions.length > 0 && <QuizCard key={currentIndex} question={questions[currentIndex]} qIndex={currentIndex} total={questions.length} answer={answers[currentIndex]} onAnswer={handleAnswer} onNext={handleNext} isLast={currentIndex === questions.length - 1} />}
 
-          {/* Results */}
           {status === "complete" && (
-            <ResultsScreen
-              questions={questions}
-              answers={answers}
-              onRetry={handleRetry}
-              onViewStats={() => navigate("/profile")}
-              styles={styles}
-            />
+            <div style={{ background: P.surface, border: `1px solid ${P.border}`, borderRadius: "24px", padding: "32px 28px", boxShadow: "0 6px 32px rgba(90,60,30,0.10)" }}>
+              <ResultsScreen questions={questions} answers={answers} onRetry={handleRetry} onViewStats={() => navigate("/profile")} />
+            </div>
           )}
         </div>
       </div>

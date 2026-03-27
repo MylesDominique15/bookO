@@ -404,10 +404,9 @@ const overlayStyle =
             aria-hidden="true"
             className="absolute invisible pointer-events-none text-lg leading-loose"
             style={{
-              // Match visible text width: card max (48rem) minus card px-10 and line px-3
-              width:
-                "calc(min(48rem, 100vw - 14rem - 3rem) - 5rem - 1.5rem)",
-              fontFamily: isOD ? "'OpenDyslexic', sans-serif" : "inherit",
+              width: "calc(min(48rem, 100vw - 14rem - 3rem) - 5rem - 1.5rem)",
+              // CHANGE THIS LINE:
+              fontFamily: isOD ? "OpenDyslexic, sans-serif" : "inherit",
               whiteSpace: "normal",
               wordBreak: "break-word",
             }}
@@ -418,7 +417,7 @@ const overlayStyle =
             className="w-full max-w-3xl rounded-3xl shadow-2xl shadow-black px-10 pt-9 pb-10"
             style={{
               ...paperStyles,
-              fontFamily: isOD ? "'OpenDyslexic', sans-serif" : "'Georgia', serif",
+              fontFamily: isOD ? "OpenDyslexic, sans-serif" : "'Georgia', serif",
             }}
           >
             {/* Document header */}
